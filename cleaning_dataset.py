@@ -5,20 +5,7 @@ data_extracted = []
 
 
 regex_url = r'https://t\.co(\w|/)+'
-print("chucha"[:-1])
-print("chucha"[1:-1])
-"""
-wea = "@mabitalvir @rafavalenzuelap @GobiernodeChile @sebastianpinera Jajajajaj verdad que Bachelet es sor teresa de calcu… https://t.co/GpGe5wFvcv"
 
-#wea = "https://t.co/xqwR4ajlvq\""
-m = re.search(regex_url, wea)
-
-
-if m is not None:
-    wea = wea.replace(m.group(0), '')
-
-print(wea)
-"""
 
 def remove_url(text):
     m = re.search(regex_url, text)
@@ -38,11 +25,7 @@ def normalize_special_characters(text):
 
 
 def reduce_some_characters(text):
-    #text = re.sub(r'""', '"', text)
-    #text = re.sub(r'\?\?+', '?', text)
-    #text = re.sub(r'\.\.\.\.+', '...', text)
     text = re.sub(r'[^\w\s]', '', text)
-
     return text
 
 counter = 0
@@ -55,7 +38,6 @@ with open('tweets.txt', 'r') as file:
 
         if len(line) == 0 or is_bad_string(line):
             continue
-
 
         if len(line) >= 2 and line[0] == line[-1] == '"':
             line = line[1:-1]

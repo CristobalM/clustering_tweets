@@ -4,7 +4,7 @@ import numpy as np
 import heapq
 
 NUM_CLUSTERS = 4
-BINS_NUM = 15
+BINS_NUM = 7
 
 with open('cluster_' + str(NUM_CLUSTERS) + '.pickle', 'rb') as f:
     data = pickle.load(f)
@@ -81,19 +81,19 @@ with open('results_clusters_'+str(NUM_CLUSTERS)+'.txt', 'w') as f:
         c_id += 1
 
 
-
 for i in range(0, NUM_CLUSTERS):
+    plt.figure()
+    plt.gca().yaxis.grid(True)
 
     X_words = histograms[i][0]
     Y_occurrences = histograms[i][1]
 
-
     print(X_words)
     print(Y_occurrences)
 
-
-    plt.bar(range(len(Y_occurrences)), Y_occurrences, align='center')
+    plt.bar(range(len(Y_occurrences)), Y_occurrences, align='center', edgecolor='black', color='lightblue')
     plt.xticks(range(len(Y_occurrences)), X_words, size='small')
     plt.title("Cluster #"+ str(i+1) + "/" + str(NUM_CLUSTERS))
-    plt.show()
+
+plt.show()
 
