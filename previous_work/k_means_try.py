@@ -1,20 +1,19 @@
-from sklearn.cluster import KMeans
-import re
-from nltk.stem import SnowballStemmer
-from nltk.corpus import stopwords
 import mmh3
 import pickle
+import re
 
-from k_means import jaccard_dist, k_means
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer
 
-#import nltk
-#nltk.download('stopwords')
+from previous_work.k_means import jaccard_dist, k_means
+
+# import nltk
+# nltk.download('stopwords')
 
 stemmer = SnowballStemmer('spanish')
 the_stop_words = stopwords.words('spanish')
 
 NUM_CLUSTERS = 4
-
 
 
 def strcmp(a, b):
@@ -38,6 +37,7 @@ def strcmp(a, b):
 
     return 0
 
+
 def without_stop_words(a_list):
     out = []
 
@@ -46,6 +46,7 @@ def without_stop_words(a_list):
             out.append(word)
 
     return out
+
 
 def remove_consecutive_repeated(a_list):
     out = []
@@ -57,6 +58,7 @@ def remove_consecutive_repeated(a_list):
 
     return out
 
+
 def normalize_data():
     words_in_sentences_raw = []
     counter = 0
@@ -65,13 +67,13 @@ def normalize_data():
     with open('clean_data.txt', 'r') as f:
         for line in f:
             no_endline_line = re.sub('\n', '', line).strip()
-            #no_endline_line = parsetree(no_endline_line, lemmatta=True)
+            # no_endline_line = parsetree(no_endline_line, lemmatta=True)
             words_in_line = no_endline_line.split(' ')
             words_in_line = list(map(lambda x: x.lower(), words_in_line))
             words_in_line = without_stop_words(words_in_line)
             words_in_line.sort()
             words_in_line = remove_consecutive_repeated(words_in_line)
-            #words_in_line = list(filter(lambda x: x != 'bachelet', words_in_line))
+            # words_in_line = list(filter(lambda x: x != 'bachelet', words_in_line))
             words_in_sentences_raw.append(words_in_line)
             words_in_line = list(map(stemmer.stem, words_in_line))
             words_in_line = list(map(lambda x: mmh3.hash(x), words_in_line))
@@ -82,19 +84,16 @@ def normalize_data():
 
             counter += 1
 
-
     return normalized, mapping_lines, words_in_sentences_raw
-
 
 
 normalized, mapping_lines, words_in_sentences_raw = normalize_data()
 
-#for sentence in normalized:
+# for sentence in normalized:
 #    print(sentence)
 
 clusters, result, centroids = k_means(normalized, NUM_CLUSTERS, jaccard_dist)
 
-
-#print(clusters)
-with open('cluster_'+ str(NUM_CLUSTERS)  + '.pickle', 'wb') as f:
+# print(clusters)
+with open('cluster_' + str(NUM_CLUSTERS) + '.pickle', 'wb') as f:
     pickle.dump([clusters, result, centroids, mapping_lines, words_in_sentences_raw], f, pickle.HIGHEST_PROTOCOL)

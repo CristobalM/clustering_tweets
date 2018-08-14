@@ -9,7 +9,6 @@ BINS_NUM = 15
 with open('cluster_' + str(NUM_CLUSTERS) + '.pickle', 'rb') as f:
     data = pickle.load(f)
 
-
 clusters = data[0]
 result = data[1]
 centroids = data[2]
@@ -31,7 +30,6 @@ for cluster in clusters:
                 histo_words.append(word)
                 histo_occurrences.append(1)
                 dict_words_to_list[word] = len(histo_words) - 1
-
 
     to_sort = []
     for i in range(0, len(histo_words)):
@@ -61,10 +59,10 @@ with open('indexes.txt', 'r') as indexes_f:
     for line in indexes_f:
         indexes_orig.append(int(line.replace('\n', '')))
 
-with open('results_clusters_'+str(NUM_CLUSTERS)+'.txt', 'w') as f:
+with open('results_clusters_' + str(NUM_CLUSTERS) + '.txt', 'w') as f:
     c_id = 0
     for cluster in clusters:
-        f.write('cluster #' + str(c_id +1) + ' tweets\n')
+        f.write('cluster #' + str(c_id + 1) + ' tweets\n')
         the_centroid_clean_idx = mapping_lines[centroids[c_id]]
         the_centroid_real_idx = indexes_orig[the_centroid_clean_idx]
         real_centroid = original_tweets[the_centroid_real_idx]
@@ -80,20 +78,14 @@ with open('results_clusters_'+str(NUM_CLUSTERS)+'.txt', 'w') as f:
 
         c_id += 1
 
-
-
 for i in range(0, NUM_CLUSTERS):
-
     X_words = histograms[i][0]
     Y_occurrences = histograms[i][1]
-
 
     print(X_words)
     print(Y_occurrences)
 
-
     plt.bar(range(len(Y_occurrences)), Y_occurrences, align='center')
     plt.xticks(range(len(Y_occurrences)), X_words, size='small')
-    plt.title("Cluster #"+ str(i+1) + "/" + str(NUM_CLUSTERS))
+    plt.title("Cluster #" + str(i + 1) + "/" + str(NUM_CLUSTERS))
     plt.show()
-

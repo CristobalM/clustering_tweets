@@ -8,15 +8,13 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-#import nltk
-#nltk.download('stopwords')
+# import nltk
+# nltk.download('stopwords')
 
 stemmer = SnowballStemmer('spanish')
 the_stop_words = stopwords.words('spanish')
 
 NUM_CLUSTERS = 4
-
 
 
 def strcmp(a, b):
@@ -40,6 +38,7 @@ def strcmp(a, b):
 
     return 0
 
+
 def without_stop_words(a_list):
     out = []
 
@@ -48,6 +47,7 @@ def without_stop_words(a_list):
             out.append(word)
 
     return out
+
 
 def remove_consecutive_repeated(a_list):
     out = []
@@ -59,6 +59,7 @@ def remove_consecutive_repeated(a_list):
 
     return out
 
+
 def normalize_data():
     words_in_sentences_raw = []
     counter = 0
@@ -67,16 +68,16 @@ def normalize_data():
     with open('clean_data.txt', 'r') as f:
         for line in f:
             no_endline_line = re.sub('\n', '', line).strip()
-            #no_endline_line = parsetree(no_endline_line, lemmatta=True)
+            # no_endline_line = parsetree(no_endline_line, lemmatta=True)
             words_in_line = no_endline_line.split(' ')
             words_in_line = list(map(lambda x: x.lower(), words_in_line))
             words_in_line = without_stop_words(words_in_line)
             words_in_line.sort()
-            #words_in_line = remove_consecutive_repeated(words_in_line)
-            #words_in_line = list(filter(lambda x: x != 'bachelet', words_in_line))
+            # words_in_line = remove_consecutive_repeated(words_in_line)
+            # words_in_line = list(filter(lambda x: x != 'bachelet', words_in_line))
             words_in_sentences_raw.append(words_in_line)
-            #words_in_line = list(map(stemmer.stem, words_in_line))
-            #words_in_line = list(map(lambda x: mmh3.hash(x), words_in_line))
+            # words_in_line = list(map(stemmer.stem, words_in_line))
+            # words_in_line = list(map(lambda x: mmh3.hash(x), words_in_line))
             words_in_line.sort()
             if len(words_in_line) > 5:
                 normalized.append(words_in_line)
@@ -85,10 +86,9 @@ def normalize_data():
     return normalized, mapping_lines, words_in_sentences_raw
 
 
-
 normalized, mapping_lines, words_in_sentences_raw = normalize_data()
 
-#for sentence in normalized:
+# for sentence in normalized:
 #    print(sentence)
 indexed_words = []
 mapped_hash = {}
@@ -111,7 +111,7 @@ descendant_frequency = list(map(lambda a: a[0], sorted_indexed_words))
 cut_freq = list(filter(lambda f: f >= 100, descendant_frequency))
 print(len(sorted_indexed_words))
 print(sorted_indexed_words)
-#ten most frequent words
+# ten most frequent words
 tmfw = [reverse_mapped_hash[sorted_indexed_words[i][1]] for i in range(0, min(10, len(sorted_indexed_words)))]
 tmfw_freq = descendant_frequency[0:10]
 print(tmfw)
@@ -119,7 +119,7 @@ print(tmfw_freq)
 
 x_dom = np.arange(0, len(cut_freq), 1)
 plt.plot(x_dom, cut_freq, marker='o')
-#plt.xticks(x_dom)
+# plt.xticks(x_dom)
 plt.xlabel('Palabras')
 plt.ylabel('Frecuencia')
 plt.grid()

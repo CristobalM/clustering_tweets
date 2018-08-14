@@ -3,13 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import heapq
 
-from nltk.corpus import stopwords
-from nltk.stem import SnowballStemmer
-
-stemmer = SnowballStemmer('spanish')
-the_stop_words = stopwords.words('spanish')
-
-NUM_CLUSTERS = 7
+NUM_CLUSTERS = 4
 BINS_NUM = 7
 
 with open('cluster_' + str(NUM_CLUSTERS) + '.pickle', 'rb') as f:
@@ -26,8 +20,8 @@ foo_map = FooMaping()
 clusters = data[0]
 result = data[1]
 centroids = data[2]
-mapping_lines = foo_map
-words_in_sentences_raw = data[3]
+mapping_lines = data[3]
+words_in_sentences_raw = data[4]
 histograms = []
 for cluster in clusters:
     histo_words = []
@@ -37,8 +31,6 @@ for cluster in clusters:
         real_idx = mapping_lines[idx]
         sentence = words_in_sentences_raw[real_idx]
         for word in sentence:
-            if word.lower() in the_stop_words:
-                continue
             if word in dict_words_to_list.keys():
                 histo_idx = dict_words_to_list[word]
                 histo_occurrences[histo_idx] += 1

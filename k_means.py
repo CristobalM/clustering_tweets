@@ -1,6 +1,7 @@
 import random
 import numpy as np
 
+
 def strcmp(a, b):
     len_a = len(a)
     len_b = len(b)
@@ -22,6 +23,7 @@ def strcmp(a, b):
 
     return 0
 
+
 def intersect_sentences_num(s_a, s_b):
     i = 0
     j = 0
@@ -31,7 +33,7 @@ def intersect_sentences_num(s_a, s_b):
         word_b = s_b[j]
 
         cmp = word_b - word_a
-        #cmp = strcmp(word_a, word_b)
+        # cmp = strcmp(word_a, word_b)
         if cmp == 0:
             count += 1
             i += 1
@@ -52,7 +54,7 @@ def union_sentences_num(s_a, s_b):
 
 
 def jaccard_dist(set_a, set_b):
-    if len(set_a) == 0 or len(set_b) == 0: # distance with empty set
+    if len(set_a) == 0 or len(set_b) == 0:  # distance with empty set
         return 1.0
     intersect_num = intersect_sentences_num(set_a, set_b)
     union_num = len(set_a) + len(set_b) - intersect_num
@@ -67,6 +69,7 @@ def init_clusters(k):
 
     return clusters
 
+
 """
 @:param data: List<List>
 @:param k: Int
@@ -74,6 +77,8 @@ def init_clusters(k):
 @:returns (List<List>, List, List)
 
 """
+
+
 def k_means(data, k, dist_fun):
     centroids = []
     clusters = init_clusters(k)
@@ -121,7 +126,7 @@ def k_means(data, k, dist_fun):
             cluster_length = len(cluster)
             dist_matrix = np.zeros((cluster_length, cluster_length))
             for i in range(0, cluster_length):
-                for l in range(i+1, cluster_length):
+                for l in range(i + 1, cluster_length):
                     dist_matrix[i, l] = dist_fun(data[cluster[i]], data[cluster[l]])
                     dist_matrix[l, i] = dist_matrix[i, l]
 
@@ -131,7 +136,7 @@ def k_means(data, k, dist_fun):
                 if len(data[cluster[i]]) == 0:
                     row_sum = np.inf
                 else:
-                    row_sum = np.sqrt(np.sum(dist_matrix[i, :]**2))/len(data[cluster[i]])
+                    row_sum = np.sqrt(np.sum(dist_matrix[i, :] ** 2)) / len(data[cluster[i]])
                 if row_sum < min_sum:
                     new_centroid = cluster[i]
                     min_sum = row_sum
@@ -146,10 +151,4 @@ def k_means(data, k, dist_fun):
             previous_centroids = centroids[:]
             to_stop = 0
 
-    return clusters, result, centroids
-
-
-
-
-
-
+    return result, centroids
