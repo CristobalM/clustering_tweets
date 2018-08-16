@@ -1,0 +1,7 @@
+Se está usando Python 3.6.5
+
+Instalar requerimientos con
+pip install -r requirements.txt
+
+Correr el programa con
+python work.py

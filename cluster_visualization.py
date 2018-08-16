@@ -99,7 +99,7 @@ class ClusterVisualization:
             pca_num_components (int): PCA target dimension before applying t-SNE
             tsne_num_components (int): t-SNE target dimension, works only with value 2
         """
-        fname = '%s.reduced_dim_PCA%d_SNE%d.pickle' % (self.clean_input_filename, pca_num_components, tsne_num_components)
+        fname = 'results_data/%s.reduced_dim_PCA%d_SNE%d.pickle' % (self.clean_input_filename, pca_num_components, tsne_num_components)
         if os.path.isfile(fname):
             with open(fname, 'rb') as f:
                 Y = pickle.load(f)
