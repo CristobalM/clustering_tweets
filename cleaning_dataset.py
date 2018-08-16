@@ -1,48 +1,50 @@
 from clean_utils import *
 
-data_extracted = []
 
-regex_url = r'https://t\.co(\w|/)+'
+def cleaning():
+    data_extracted = []
 
-counter = 0
-mapping_lines = []
-with open('tweets.txt', 'r') as file:
-    for line in file:
-        line = re.sub(r'\s+', ' ', line).strip()
-        line = re.sub(r'\s+', ' ', line).strip()
-        line = re.sub('\r\n', '\n', line)
+    regex_url = r'https://t\.co(\w|/)+'
 
-        if len(line) == 0 or is_bad_string(line):
-            continue
+    counter = 0
+    mapping_lines = []
+    with open('tweets.txt', 'r') as file:
+        for line in file:
+            line = re.sub(r'\s+', ' ', line).strip()
+            line = re.sub(r'\s+', ' ', line).strip()
+            line = re.sub('\r\n', '\n', line)
 
-        if len(line) >= 2 and line[0] == line[-1] == '"':
-            line = line[1:-1]
-        elif len(line) >= 1 and line[0] == '"':
-            line = line[1:]
-        elif len(line) >= 1 and line[-1] == '"':
-            line = line[:-1]
+            if len(line) == 0 or is_bad_string(line):
+                continue
 
-        line = remove_url(regex_url, line)
-        line = remove_url(regex_url, line)
-        line = remove_url(regex_url, line)
-        line = remove_url(regex_url, line)
-        line = normalize_special_characters(line)
-        line = reduce_some_characters(line)
+            if len(line) >= 2 and line[0] == line[-1] == '"':
+                line = line[1:-1]
+            elif len(line) >= 1 and line[0] == '"':
+                line = line[1:]
+            elif len(line) >= 1 and line[-1] == '"':
+                line = line[:-1]
 
-        line = re.sub(r'\s+', ' ', line).strip()
+            line = remove_url(regex_url, line)
+            line = remove_url(regex_url, line)
+            line = remove_url(regex_url, line)
+            line = remove_url(regex_url, line)
+            line = normalize_special_characters(line)
+            line = reduce_some_characters(line)
 
-        if len(line) > 0:
-            data_extracted.append(line)
-            mapping_lines.append(counter)
+            line = re.sub(r'\s+', ' ', line).strip()
 
-        counter += 1
+            if len(line) > 0:
+                data_extracted.append(line)
+                mapping_lines.append(counter)
 
-print(data_extracted)
+            counter += 1
 
-with open('clean_data.txt', 'w') as f:
-    for line in data_extracted:
-        f.write(line + '\n')
+    print(data_extracted)
 
-with open('indexes.txt', 'w') as f:
-    for index in mapping_lines:
-        f.write(str(index) + '\n')
+    with open('clean_data.txt', 'w') as f:
+        for line in data_extracted:
+            f.write(line + '\n')
+
+    with open('indexes.txt', 'w') as f:
+        for index in mapping_lines:
+            f.write(str(index) + '\n')

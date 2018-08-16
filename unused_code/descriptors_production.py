@@ -175,31 +175,4 @@ class Vocabulary:
     def __len__(self):
         return len(self.vocabulary)
 
-"""
-dhandler = DocumentsHandler()
-vocabulary = dhandler.get_vocabulary()
-dhandler.enter_document("wena culiao se se ee ee wena wena dqwd 12 55  6 5 e s qw qw as as qw gkgkhmf gf gf vb v ")
-dhandler.enter_document("wena culiao se se ee ee wena wena")
-dhandler.enter_document("wena culiao se se wena")
-dhandler.enter_document("asdkjuqwdiqhd213ius adiq23huwd a4uia a1sdi wena")
-dhandler.enter_document("asdkjuqwdiqhd213i  us adiq23huwd a4uia a1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213 ius adiq23huwd a4uia a1sdi")
-dhandler.enter_document("asdkjuqwd i hd213ius adiq23huwd a4uia a1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213 ius adiq23huwd a4uia a1 2 2sdi")
-dhandler.enter_document("asdkjuqw diq hd211 23ius a 11diq22 2 213huwd a4uia a1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213ius adiq23huwd  3  a4uia a1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213ius adiq23huwd a4uia a 23 1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213ius adiq23huwd a4uia a1sdi")
-dhandler.enter_document("asdkjuqwdiqhd213ius adiq23huwd a4uia a1sdi")
-print(dhandler.documents_nice_vectors[0])
-dhandler.convert_to_tfidf()
-import pprint as pp
-pp.pprint(dhandler.documents_nice_vectors)
 
-result = np.sqrt(dhandler.documents_nice_vectors[0].distance(dhandler.documents_nice_vectors[3]))
-print(result)
-csr, sparsity = dhandler.to_csr_matrix()
-print(csr)
-print("sparsity is %f" % sparsity)
-#print(result)
-"""

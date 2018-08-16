@@ -1,7 +1,6 @@
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
-import heapq
 
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer

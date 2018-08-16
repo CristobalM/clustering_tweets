@@ -1,27 +1,33 @@
-import descriptors_production
-import pprint as pp
-import k_means
 import pickle
 import re
 import clean_utils
+
 from sklearn.feature_extraction.text import TfidfVectorizer as TfidfVectorizer
 
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
+
+from sklearn.decomposition import TruncatedSVD
+from globals import save_result, load_if_exists
 
 stemmer = SnowballStemmer('spanish')
 the_stop_words = stopwords.words('spanish')
 
 
 class ClusteringRunner:
-    def __init__(self, clean_data_filename, algorithm, **algorithm_parameters):
+    """Has common functionality for running and algorithm and saving its data
+
+        Arguments:
+            clean_input_filename (str): Full filename of the clean data
+            algorithm (function): Algorithm to run
+    """
+    def __init__(self, clean_input_filename, algorithm, **algorithm_parameters):
         self.algorithm = algorithm
-        self.clean_data_filename = clean_data_filename
+        self.clean_input_filename = clean_input_filename
         self.algorithm_parameters = algorithm_parameters
 
     def run_algorithm(self):
-        with open(self.clean_data_filename, 'r') as f:
-            dhandler = descriptors_production.DocumentsHandler()
+        with open(self.clean_input_filename, 'r') as f:
             words_in_sentences_raw = []
             docs = []
             for line in f:
@@ -31,23 +37,30 @@ class ClusteringRunner:
                 words_in_line, _ = clean_utils.without_stop_words(words_in_line)
                 line = ' '.join(words_in_line)
                 docs.append(line)
-                dhandler.enter_document(line)
 
             vectorizer = TfidfVectorizer(min_df=1)
             tdidf = vectorizer.fit_transform(docs)
-            #dhandler.convert_to_tfidf()
-            #tdidf, sparsity = dhandler.to_csr_matrix()
+            vocab_size = len(vectorizer.vocabulary_)
 
-            result, extra, output_fname = self.algorithm(tdidf, mytfidf=False, **self.algorithm_parameters)
-            with open('%s.pickle' % output_fname, 'wb') as f:
-                pickle.dump([result, extra, words_in_sentences_raw, tdidf], f, pickle.HIGHEST_PROTOCOL)
-            print(list(result))
-            print(extra)
-            """
-            result, extra, output_fname = self.algorithm(tdidf, **self.algorithm_parameters)
-            with open('%s.pickle' % output_fname, 'wb') as f:
-                pickle.dump([result, extra, words_in_sentences_raw], f, pickle.HIGHEST_PROTOCOL)
-            print(list(result))
-            print(extra)
-            """
+            svd_components = 1000
+            svd_file = 'results_data/SVD%d_%s'% (svd_components, self.clean_input_filename)
 
+            already_exists, svd_result = load_if_exists(svd_file)
+            if not already_exists:
+                print('in SVD STEP')
+                svd_result = TruncatedSVD(n_components=svd_components, n_iter=7, random_state=0).fit_transform(tdidf)
+                print('SVD STEP OK')
+                save_result(svd_file, svd_result)
+            else:
+                print('SVD ALREADY SAVED')
+            parameters_str = ','.join(['%s=%s' % (str(key), str(value)) for key, value in self.algorithm_parameters.items()])
+            print('RUNNING ALGORITHM with parameters: %s' % parameters_str)
+            result, extra, output_fname = self.algorithm(svd_result, **self.algorithm_parameters)
+            #result, extra, output_fname = self.algorithm(tdidf, **self.algorithm_parameters)
+            print('ALGORITHM OK')
+
+            with open('%s.pickle' % output_fname, 'wb') as f:
+                pickle.dump([result, extra, words_in_sentences_raw, tdidf, vocab_size], f, pickle.HIGHEST_PROTOCOL)
+
+            #print(list(result))
+            #print('Extra: %d' % extra)

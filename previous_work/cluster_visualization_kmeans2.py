@@ -1,7 +1,5 @@
 import pickle
 import matplotlib.pyplot as plt
-import numpy as np
-import heapq
 
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
@@ -108,4 +106,4 @@ for i in range(0, NUM_CLUSTERS):
     plt.xticks(range(len(Y_occurrences)), X_words, size='small')
     plt.title("Cluster #" + str(i + 1) + "/" + str(NUM_CLUSTERS))
 
-plt.show()
+plt.draw()
