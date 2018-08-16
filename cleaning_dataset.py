@@ -39,7 +39,7 @@ def cleaning():
 
             counter += 1
 
-    print(data_extracted)
+
 
     with open('clean_data.txt', 'w') as f:
         for line in data_extracted:
