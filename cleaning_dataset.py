@@ -39,8 +39,6 @@ def cleaning():
 
             counter += 1
 
-
-
     with open('clean_data.txt', 'w') as f:
         for line in data_extracted:
             f.write(line + '\n')
