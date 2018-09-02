@@ -33,6 +33,8 @@ def runner_with_visualization(input_filename=DEFAULT_CLEAN_DATA_FNAME,
     runner(input_filename, num_clusters)
     print('runner OK')
     print('with visualization')
-    KMeansClusterVisualization(input_filename, num_clusters, load_now=True, visualize_now=True,
+    viz = KMeansClusterVisualization(input_filename, num_clusters, load_now=True, visualize_now=True,
                                pca_num_components=pca_num_components, draw=draw)
+
     print('visualization OK')
+    return viz.extra_data()

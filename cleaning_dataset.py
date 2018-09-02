@@ -8,6 +8,9 @@ def cleaning():
 
     counter = 0
     mapping_lines = []
+
+    tweets_to_save = {}
+
     with open('tweets.txt', 'r') as file:
         for line in file:
             line = re.sub(r'\s+', ' ', line).strip()
@@ -32,10 +35,13 @@ def cleaning():
             line = reduce_some_characters(line)
 
             line = re.sub(r'\s+', ' ', line).strip()
+            line = re.sub('\n', '', line).strip().lower()
 
             if len(line) > 0:
-                data_extracted.append(line)
-                mapping_lines.append(counter)
+                if line not in tweets_to_save:
+                    data_extracted.append(line)
+                    mapping_lines.append(counter)
+                    tweets_to_save[line] = True
 
             counter += 1
 

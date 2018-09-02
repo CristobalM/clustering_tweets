@@ -42,5 +42,6 @@ def runner(input_filename, eps, min_samples, metric='cosine', algo='auto'):
 def runner_with_visualization(input_filename=DEFAULT_CLEAN_DATA_FNAME,
                               eps=0.7, min_samples=default_min_samples, pca_num_components=100, draw=True):
     runner(input_filename, eps, min_samples)
-    DBScanClusterVisualization(input_filename, eps, min_samples,
+    viz = DBScanClusterVisualization(input_filename, eps, min_samples,
                                load_now=True, visualize_now=True, pca_num_components=pca_num_components, draw=draw)
+    return viz.extra_data()

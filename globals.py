@@ -31,6 +31,7 @@ def save_result(fname, result):
 
 KMEANS_NAME = 'KMeans'
 DBSCAN_NAME = 'DBScan'
+GMMEM_NAME = 'GMMem'
 
 DEFAULT_CLEAN_DATA_FNAME = 'clean_data.txt'
 INDEXES_FNAME = 'indexes.txt'

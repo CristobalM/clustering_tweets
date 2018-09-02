@@ -26,7 +26,7 @@ class ClusteringRunner:
         self.clean_input_filename = clean_input_filename
         self.algorithm_parameters = algorithm_parameters
 
-    def run_algorithm(self):
+    def run_algorithm(self, with_svd=False):
         with open(self.clean_input_filename, 'r') as f:
             words_in_sentences_raw = []
             docs = []
@@ -34,28 +34,33 @@ class ClusteringRunner:
                 line = re.sub('\n', '', line).strip().lower()
                 words_in_line = line.split(' ')
                 words_in_sentences_raw.append(words_in_line)
-                words_in_line, _ = clean_utils.without_stop_words(words_in_line)
+                #words_in_line, _ = clean_utils.without_stop_words(words_in_line)
                 line = ' '.join(words_in_line)
                 docs.append(line)
 
-            vectorizer = TfidfVectorizer(min_df=1)
+            vectorizer = TfidfVectorizer(min_df=1, ngram_range=(3, 3))
+            #vectorizer = TfidfVectorizer(min_df=1)
             tdidf = vectorizer.fit_transform(docs)
             vocab_size = len(vectorizer.vocabulary_)
 
-            svd_components = 1000
-            svd_file = 'results_data/SVD%d_%s'% (svd_components, self.clean_input_filename)
+            data_for_alg = tdidf
 
-            already_exists, svd_result = load_if_exists(svd_file)
-            if not already_exists:
-                print('in SVD STEP')
-                svd_result = TruncatedSVD(n_components=svd_components, n_iter=7, random_state=0).fit_transform(tdidf)
-                print('SVD STEP OK')
-                save_result(svd_file, svd_result)
-            else:
-                print('SVD ALREADY SAVED')
+            if with_svd:
+                svd_components = 2500
+                svd_file = 'results_data/SVD%d_%s'% (svd_components, self.clean_input_filename)
+
+                already_exists, svd_result = load_if_exists(svd_file)
+                if not already_exists:
+                    print('in SVD STEP')
+                    svd_result = TruncatedSVD(n_components=svd_components, n_iter=7, random_state=0).fit_transform(tdidf)
+                    print('SVD STEP OK')
+                    save_result(svd_file, svd_result)
+                else:
+                    print('SVD ALREADY SAVED')
+                data_for_alg = svd_result
             parameters_str = ','.join(['%s=%s' % (str(key), str(value)) for key, value in self.algorithm_parameters.items()])
             print('RUNNING ALGORITHM with parameters: %s' % parameters_str)
-            result, extra, output_fname = self.algorithm(svd_result, **self.algorithm_parameters)
+            result, extra, output_fname = self.algorithm(data_for_alg, **self.algorithm_parameters)
             #result, extra, output_fname = self.algorithm(tdidf, **self.algorithm_parameters)
             print('ALGORITHM OK')
 

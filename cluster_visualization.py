@@ -1,6 +1,6 @@
 import pickle
 import matplotlib.pyplot as plt
-from globals import cluster_result_fname, KMEANS_NAME, DBSCAN_NAME
+from globals import cluster_result_fname, KMEANS_NAME, DBSCAN_NAME, GMMEM_NAME
 
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
@@ -14,6 +14,10 @@ from sklearn.manifold import TSNE
 import numpy as np
 
 import os.path
+
+from sklearn.metrics import silhouette_samples, silhouette_score
+import matplotlib.cm as cm
+
 
 stemmer = SnowballStemmer('spanish')
 the_stop_words = stopwords.words('spanish')
@@ -40,6 +44,7 @@ class ClusterVisualization:
         self.clusters = {}
         self.extra_title = '' if not hasattr(self, 'extra_title') else self.extra_title
         self.draw = True if 'draw' not in kwargs else kwargs['draw']
+        self.silhouette_avg = None
 
         if 'pca_num_components' in kwargs:
             self.pca_num_components = kwargs['pca_num_components']
@@ -61,6 +66,16 @@ class ClusterVisualization:
             self.data = pickle.load(f)
             [self.labels, self.cluster_num, self.words_in_sentences_raw, self.tdidf, self.vocab_size] = self.data
             self.obtain_clusters()
+
+    def extra_data(self):
+        return {
+            'silhouette_avg': self.silhouette_avg
+        }
+
+    def silhouette(self):
+        if self.cluster_num <= 1:
+            return
+        self.silhouette_avg = silhouette_score(self.tdidf, self.labels)
 
     def obtain_clusters(self):
         """This obtains a better representation for the clusters which is used by the visualize() step"""
@@ -107,7 +122,7 @@ class ClusterVisualization:
             if pca_num_components == -1:
                 pre_red_data = X
             else:
-                print("Before PCA")
+                print("Before PCA, data size = %d, first_size = %d" % (len(X), len(X[0])))
                 pre_red_data = PCA(n_components=pca_num_components).fit_transform(X)
                 print("After PCA")
 
@@ -122,6 +137,9 @@ class ClusterVisualization:
 
     def output_clustered_tweets_to_file(self):
         """Writes the tweets to a file organized by cluster"""
+        if os.path.isfile('%s_result_clustered_tweets_.txt' % self.filename):
+            return
+
         original_tweets = []
 
         with open('tweets.txt', 'r') as orig_tw_f:
@@ -163,6 +181,21 @@ class ClusterVisualization:
             print("ERROR: Data has not been loaded")
             return
 
+        self.output_clustered_tweets_to_file()
+
+        extra_title = ', %s' % self.extra_title if len(self.extra_title) > 0 else ''
+        title = 'Clustering tweets, algoritmo: %s%s' % (self.algo_name(), extra_title)
+        output_vis = 'result_images/%s.png' % title.replace(' ', '_')
+        """
+        silhouette_png_fname = 'result_images/%s_silhouette.png' % title.replace(' ', '_')
+        if not os.path.isfile(silhouette_png_fname):
+            self.silhouette(silhouette_png_fname)
+        """
+        self.silhouette()
+        if os.path.isfile(output_vis):
+            return
+
+
         tsne_num_components = 2
         X = self.tdidf.todense()
         Y = self.calc_vis_data_if_not_saved(X, pca_num_components=self.pca_num_components,
@@ -193,7 +226,7 @@ class ClusterVisualization:
         ax.grid(True, alpha=0.1)
 
         rows_num = self.cluster_num / 20
-        cols_num = int(self.cluster_num / rows_num)
+        cols_num = 0 if rows_num == 0 else int(self.cluster_num / rows_num)
 
         ax.legend(bbox_to_anchor=(-0.15, 1.05, 1.25, 0.202), loc=3, ncol=cols_num, mode="expand", borderaxespad=0.)
 
@@ -201,8 +234,7 @@ class ClusterVisualization:
 
         min_x, max_x = int(np.min(XX)/10)*10, int(np.max(XX)/10)*10
         min_y, max_y = int(np.min(YY)/10)*10, int(np.max(YY)/10)*10
-        extra_title = ', %s' % self.extra_title if len(self.extra_title) > 0 else ''
-        title = 'Clustering tweets, algoritmo: %s%s' % (self.algo_name(), extra_title)
+
         ax.set_title(title)
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
@@ -215,7 +247,6 @@ class ClusterVisualization:
         plt.savefig('result_images/%s.png' % title.replace(' ', '_'))
         if not self.draw:
             plt.close()
-        self.output_clustered_tweets_to_file()
         #print('Tamano vocabulario %d' %self.vocab_size)
 
 
@@ -253,6 +284,24 @@ class DBScanClusterVisualization(ClusterVisualization):
     def __init__(self, clean_input_filename, eps, min_samples, **kwargs):
         self.set_extra_title('eps=%.3f, min samples = %d' % (eps, min_samples))
         filename = cluster_result_fname(self.algo_name(), eps='%.3f'%eps, minsamples=min_samples)
+        super().__init__(filename, clean_input_filename, **kwargs)
+
+
+class GMMemClusterVisualization(ClusterVisualization):
+    """Configures ClusterVisualization to receive GMMem parameters
+
+    Attributes:
+        clean_input_filename (str): Full filename of the clean data
+        centroid_num (int): Number of centroids for kmeans.
+        **kwargs: Optional parameters such as 'pca_num_components'(int), 'load_now'(bool), 'visualize_now'(bool)
+    """
+    @staticmethod
+    def algo_name():
+        return GMMEM_NAME
+
+    def __init__(self, clean_input_filename, centroid_num, **kwargs):
+        self.set_extra_title('k = %d' % centroid_num)
+        filename = cluster_result_fname(self.algo_name(), k=centroid_num)
         super().__init__(filename, clean_input_filename, **kwargs)
 
 
